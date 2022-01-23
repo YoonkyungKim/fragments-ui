@@ -1,4 +1,5 @@
 import { Auth, getUser } from './auth';
+import { getUserFragments } from './api';
 
 async function init() {
   // Get our UI elements
@@ -12,7 +13,7 @@ async function init() {
     // https://docs.amplify.aws/lib/auth/advanced/q/platform/js/#identity-pool-federation
     Auth.federatedSignIn();
   };
-  
+
   logoutBtn.onclick = () => {
     // Sign-out of the Amazon Cognito Hosted UI (requires redirects), see:
     // https://docs.amplify.aws/lib/auth/emailpassword/q/platform/js/#sign-out
@@ -27,6 +28,8 @@ async function init() {
     return;
   }
 
+  getUserFragments(user);
+  
   // Log the user info for debugging purposes
   console.log({ user });
 
