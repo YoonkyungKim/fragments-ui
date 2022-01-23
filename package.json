@@ -1,0 +1,29 @@
+{
+  "name": "fragments-ui",
+  "private": true,
+  "version": "0.0.1",
+  "description": "Fragments UI testing web app",
+  "engines": {
+    "node": ">=16"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/YoonkyungKim/fragments-ui.git"
+  },
+  "keywords": [],
+  "author": "Yoonkyung Kim <ykim268@myseneca.ca>",
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://github.com/YoonkyungKim/fragments-ui/issues"
+  },
+  "homepage": "https://github.com/YoonkyungKim/fragments-ui#readme",
+  "devDependencies": {
+    "parcel": "^2.2.1"
+  },
+  "dependencies": {
+    "aws-amplify": "^4.3.12"
+  }
+}
