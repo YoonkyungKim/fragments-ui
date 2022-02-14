@@ -22,7 +22,8 @@
   },
   "homepage": "https://github.com/YoonkyungKim/fragments-ui#readme",
   "devDependencies": {
-    "parcel": "^2.2.1"
+    "parcel": "^2.2.1",
+    "prettier": "2.5.1"
   },
   "dependencies": {
     "aws-amplify": "^4.3.12"
