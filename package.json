@@ -8,7 +8,8 @@
   },
   "scripts": {
     "start": "npx parcel src/index.html",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint --config .eslintrc.js src/**"
   },
   "repository": {
     "type": "git",
@@ -22,6 +23,9 @@
   },
   "homepage": "https://github.com/YoonkyungKim/fragments-ui#readme",
   "devDependencies": {
+    "@babel/eslint-parser": "^7.17.0",
+    "eslint": "^8.9.0",
+    "eslint-plugin-html": "^6.2.0",
     "parcel": "^2.2.1",
     "prettier": "2.5.1"
   },
