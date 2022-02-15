@@ -1,11 +1,12 @@
 import { Auth, getUser } from './auth';
-import { getUserFragments } from './api';
+import { getUserFragments, getFragmentById, postFragment } from './api';
 
 async function init() {
   // Get our UI elements
   const userSection = document.querySelector('#user');
   const loginBtn = document.querySelector('#login');
   const logoutBtn = document.querySelector('#logout');
+  const fragmentSection = document.querySelector('#fragment');
 
   // Wire up event handlers to deal with login and logout.
   loginBtn.onclick = () => {
@@ -37,10 +38,30 @@ async function init() {
   userSection.hidden = false;
 
   // Show the user's username
-  userSection.querySelector('.username').innerText = user.username;
+  userSection.querySelector('.username').innerText = user.username;  
 
   // Disable the Login button
   loginBtn.disabled = true;
+
+  document.getElementById("myForm").onSubmit = () => {
+    console.log("input: " + document.getElementById("textFragment").value);
+  }
+  var myForm = document.querySelector("form");
+  myForm.addEventListener("submit", myFunction);   
+
+  async function myFunction(e) {
+    e.preventDefault();
+    console.log("input in index.html: " + document.getElementById("textFragment").value);
+    await postFragment(user, document.getElementById("textFragment").value);
+
+    const fragment = await getUserFragments(user);
+
+    //use the most recently added fragment's id
+    if (fragment && fragment !== undefined) {
+      const fg = await getFragmentById(user, fragment.data.fragments[fragment.data.fragments.length -1]);
+      fragmentSection.querySelector('.fragment').innerText = fg["data"];
+    }
+  }
 }
 
 // Wait for the DOM to be ready, then start the app
