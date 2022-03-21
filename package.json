@@ -3,13 +3,12 @@
   "private": true,
   "version": "0.0.1",
   "description": "Fragments UI testing web app",
-  "engines": {
-    "node": ">=16"
-  },
   "scripts": {
     "start": "npx parcel src/index.html",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "lint": "eslint --config .eslintrc.js src/**"
+    "lint": "eslint --config .eslintrc.js src/**",
+    "build": "parcel build src/index.html",
+    "serve": "parcel serve src/index.html"
   },
   "repository": {
     "type": "git",
@@ -22,14 +21,17 @@
     "url": "https://github.com/YoonkyungKim/fragments-ui/issues"
   },
   "homepage": "https://github.com/YoonkyungKim/fragments-ui#readme",
+  "alias": {
+    "process": false
+  },
   "devDependencies": {
     "@babel/eslint-parser": "^7.17.0",
     "eslint": "^8.9.0",
     "eslint-plugin-html": "^6.2.0",
-    "parcel": "^2.2.1",
     "prettier": "2.5.1"
   },
   "dependencies": {
+    "parcel": "^2.2.1",
     "aws-amplify": "^4.3.12"
   }
 }

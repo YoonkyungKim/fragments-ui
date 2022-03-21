@@ -6,10 +6,11 @@ const apiUrl = process.env.API_URL;
  * fragments microservice (currently only running locally). We expect a user
  * to have an `idToken` attached, so we can send that along with the request.
  */
-export async function getUserFragments(user) {
+export async function getUserFragments(user, expand=0) {
   console.log('Requesting user fragments data...');
+
   try {
-    const res = await fetch(`${apiUrl}/v1/fragments`, {
+    const res = await fetch(`${apiUrl}/v1/fragments?expand=${expand}`, {
       headers: {
         // Include the user's ID Token in the request so we're authorized
         Authorization: `Bearer ${user.idToken}`,
@@ -19,17 +20,17 @@ export async function getUserFragments(user) {
       throw new Error(`${res.status} ${res.statusText}`);
     }
     const data = await res.json();
-    console.log('Got user fragments data', { data });
+    // console.log('Got user fragments data', { data });
     return { data };
   } catch (err) {
     console.error('Unable to call GET /v1/fragments', { err });
   }
 }
 
-export async function getFragmentById(user, id) {
+export async function getFragmentById(user, id, ext='') {
   console.log(`Requesting user fragment data by id ${id}`);
   try {
-    const res = await fetch(`${apiUrl}/v1/fragments/${id}`, {
+    const res = await fetch(`${apiUrl}/v1/fragments/${id}${ext}`, {
       headers: {
         // Include the user's ID Token in the request so we're authorized
         Authorization: `Bearer ${user.idToken}`,
@@ -38,9 +39,21 @@ export async function getFragmentById(user, id) {
     if (!res.ok) {
       throw new Error(`${res.status} ${res.statusText}`);
     }
-    const data = await res.json();
-    console.log('Got fragments data with given id', { data });
-    return { data };
+
+    console.log('Got fragments data with given id', res);
+    console.log('res content type', res.headers.get("content-type"));
+
+    const contentType = res.headers.get('content-type');
+    if (contentType.includes('text/')) {
+      return [res.headers.get("content-type"), await res.text()];
+    } else if (contentType.includes('application/json')) {
+      try {
+        return [res.headers.get("content-type"), await res.json()];
+      } catch (e) {
+        console.error('cannot return json', { e });
+      }      
+    }
+    // will add more conditions for a3
   } catch (err) {
     console.error('Unable to call GET /v1/fragments/:id', { err });
   }
@@ -49,7 +62,7 @@ export async function getFragmentById(user, id) {
 /**
  * Post fragment to the server
  */
-export async function postFragment(user, value) {
+export async function postFragment(user, value, contentType) {
   console.log('Post fragment data...');
   try {
     const res = await fetch(`${apiUrl}/v1/fragments`, {
@@ -57,6 +70,7 @@ export async function postFragment(user, value) {
       headers: {
         // Include the user's ID Token in the request so we're authorized
         Authorization: `Bearer ${user.idToken}`,
+        'Content-Type': contentType,
       },
       body: value,
     });

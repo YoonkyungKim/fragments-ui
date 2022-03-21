@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <title>Fragments UI</title>
     <link rel="stylesheet" href="https://unpkg.com/bamboo.css" />
-    <script type="module" src="app.js"></script>
+    <!-- <script type="module" src="app.js"></script> -->
   </head>
   <body>
     <h1>Fragments UI</h1>
@@ -14,14 +14,62 @@
     <section hidden id="user">
       <h2>Hello <span class="username"></span>!</h2>
     </section>
+    
+    <h3>Create a fragment</h3>
+    <section id="type">
+      <label for="types">Choose a fragment type:</label>
+      <select id="types" name="typeList" form="typeform">
+        <option value="text/plain">text/plain</option>
+        <option value="text/markdown">text/markdown</option>
+        <option value="text/html">text/html</option>
+        <option value="application/json">application/json</option>
+        <option value="application/json" disabled>image/png</option>
+        <option value="application/json" disabled>image/jpeg</option>
+        <option value="application/json" disabled>image/webp</option>
+        <option value="application/json" disabled>image/gif</option>
+      </select>
+    </section>
 
-    <section id="fragment">
-      <form id="myForm" >
-        <label for="textFragment">Enter some text:</label><br>
-        <input type="text" id="textFragment" name="textFragment" placeholder="Enter fragment"><br>
+    </br>
+
+    <section id="textFormSection">
+      <form id="textForm" >
+        <label for="textFragment">Enter some text:</label>
+        <input type="text" id="textFragment" name="textFragment" placeholder="Enter fragment">
+        </br></br>
         <input type="submit" value="Submit">
-        <h2><span class="fragment"></span></h2>
+      </form>
+      <h3>or</h3>
+    </section>
+
+    <section id="fileImport">
+      <label class="button" tabindex="0">Import a file:
+        <input type="file" id="inputFile" accept="text/*,application/json" multiple>
+      </label>
+    </section>
+
+    </br>
+
+    <section id="convertType">
+      <form id="convertTypeform">
+        <label for="convertTypes">Choose a type to convert to:</label>
+        <select id="convertTypes" name="convertTypeList" form="convertTypeform">
+          <option value="noConversion">No conversion</option>
+          <option value=".txt">text/plain</option>
+          <option value=".md">text/markdown</option>
+          <option value=".html">text/html</option>
+          <option value=".json">application/json</option>
+          <option value=".png" disabled>image/png</option>
+          <option value=".jpeg" disabled>image/jpeg</option>
+          <option value=".webp" disabled>image/webp</option>
+          <option value=".gif" disabled>image/gif</option>
+        </select>
+        <input type="submit" value="Get created fragment">
       </form>
     </section>
+
+    <h2><span class="fragment"></span></h2>
   </body>
+
+  <script type="module" src="app.js"></script>
 </html>

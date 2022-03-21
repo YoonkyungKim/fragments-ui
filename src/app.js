@@ -6,7 +6,6 @@ async function init() {
   const userSection = document.querySelector('#user');
   const loginBtn = document.querySelector('#login');
   const logoutBtn = document.querySelector('#logout');
-  const fragmentSection = document.querySelector('#fragment');
 
   // Wire up event handlers to deal with login and logout.
   loginBtn.onclick = () => {
@@ -29,38 +28,135 @@ async function init() {
     return;
   }
 
-  getUserFragments(user);
-  
   // Log the user info for debugging purposes
   console.log({ user });
+
+  const expandedFragments = await getUserFragments(user, 1);
+  console.log('Got user fragments data', expandedFragments );
 
   // Update the UI to welcome the user
   userSection.hidden = false;
 
   // Show the user's username
   userSection.querySelector('.username').innerText = user.username;  
-
+  
   // Disable the Login button
   loginBtn.disabled = true;
 
-  document.getElementById("myForm").onSubmit = () => {
-    console.log("input: " + document.getElementById("textFragment").value);
-  }
-  var myForm = document.querySelector("form");
-  myForm.addEventListener("submit", myFunction);   
+  const textFormSection = document.querySelector('#textFormSection');
 
-  async function myFunction(e) {
+  document.getElementById('types').addEventListener('change', function(e) {
+    // console.log('You selected: ', this.value);
     e.preventDefault();
-    console.log("input in index.html: " + document.getElementById("textFragment").value);
-    await postFragment(user, document.getElementById("textFragment").value);
+    selectedType = e.target.value;
+    console.log('selected type: ' + selectedType);
 
-    const fragment = await getUserFragments(user);
-
-    //use the most recently added fragment's id
-    if (fragment && fragment !== undefined) {
-      const fg = await getFragmentById(user, fragment.data.fragments[fragment.data.fragments.length -1]);
-      fragmentSection.querySelector('.fragment').innerText = fg["data"];
+    if (selectedType !== 'text/plain') {
+      textFormSection.style.display="none";
+    } else {
+      textFormSection.style.display="inline-block";
     }
+    handleConvertTypeFormOptions();
+  });
+
+  let selectedType = 'text/plain';
+  
+  var textForm = document.getElementById("textForm");
+  
+  textForm.addEventListener("submit", handleTextForm);   
+ 
+
+  async function handleTextForm(e) {
+    e.preventDefault();
+    try {
+      console.log("input in index.html: " + document.getElementById("textFragment").value);
+      // console.log("selected type: " + selectedType);
+
+      await postFragment(user, document.getElementById("textFragment").value, 'text/plain');
+      
+      const fragment = await getUserFragments(user);
+
+      //use the most recently added fragment's id
+      if (fragment && fragment !== undefined) {
+        const res = await getFragmentById(user, fragment.data.fragments[fragment.data.fragments.length -1]);
+        document.querySelector('.fragment').innerText = res[1];
+      }
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
+  handleConvertTypeFormOptions();
+
+  function handleConvertTypeFormOptions() {
+    document.querySelectorAll("#convertTypes option").forEach(opt => {
+      if (opt.value !== 'noConversion') {
+        if (selectedType && selectedType.includes('text/markdown')) {
+          if (opt.value !== '.html') {
+            opt.disabled = true;
+          } else {
+            opt.disabled = false;
+          }
+        } else {
+          opt.disabled = true;
+        }
+      } else {
+        opt.disabled = false;
+      }
+    });
+  }
+
+  const inputEl = document.getElementById('inputFile');
+  inputEl?.addEventListener('change', handleFile);
+  // inputEl.addEventListener('change', handleFile);
+
+  function handleFile(evt) {
+    const files = evt.target.files; // FileList object
+    const f = files[0];
+    const reader = new FileReader();
+
+    // for a2, only support md -> html conversion.
+    async function handleConvertTypeForm(e, fragment) {
+      let res;
+      e.preventDefault();
+      const selectedConversionType = document.getElementById('convertTypes').value;
+      try {
+        if (selectedConversionType === 'noConversion') {
+          //use the most recently added fragment's id
+          res = await getFragmentById(user, fragment.data.fragments[fragment.data.fragments.length -1]);
+        } else {
+          console.log('selected conversion extension: ' + document.getElementById('convertTypes').value);
+          res = await getFragmentById(user, fragment.data.fragments[fragment.data.fragments.length -1], selectedConversionType);
+        }
+        document.querySelector('.fragment').innerText = typeof res[1] === 'object' ? JSON.stringify(res[1]) : res[1];
+      } catch (e) {
+        console.error("Get by id failed after post through file: " + e);
+        document.querySelector('.fragment').innerText = 'Get by id failed. Please check the file content uploaded.';
+      }
+    }
+
+    // Capture the file information.
+    reader.onload = (function() {
+      return async function(e) {
+        console.log("uploaded file type: " + f.type);
+ 
+        if (selectedType && selectedType !== f.type) {
+          alert('Uploaded file type must be same as selected type.');
+        } else {
+          await postFragment(user, e.target.result, f.type);
+        }
+
+        const fragment = await getUserFragments(user);
+        if (fragment && fragment !== undefined) {
+          handleConvertTypeFormOptions();
+
+          var convertTypeForm = document.getElementById("convertTypeform");
+          convertTypeForm.addEventListener("submit", (e) => handleConvertTypeForm(e, fragment)); 
+        }
+      };
+    })(f);
+
+    reader.readAsText(f);
   }
 }
 
