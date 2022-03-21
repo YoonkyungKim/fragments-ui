@@ -1,0 +1,16 @@
+# everything don’t need in the build context
+node_modules/
+.git/
+.gitignore
+.vscode/
+.github/
+.eslintrc.js
+.prettier*
+.env
+	
+# opinion
+notes.md
+
+# Build/generated files/folders
+.parcel-cache/
+dist/
