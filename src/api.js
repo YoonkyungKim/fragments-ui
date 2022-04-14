@@ -37,6 +37,7 @@ export async function getFragmentById(user, id, ext='') {
       },
     });
     if (!res.ok) {
+      console.log(`res.ok is false, ${res.status} ${res.statusText}`);
       throw new Error(`${res.status} ${res.statusText}`);
     }
 
@@ -44,8 +45,13 @@ export async function getFragmentById(user, id, ext='') {
     console.log('res content type', res.headers.get("content-type"));
 
     const contentType = res.headers.get('content-type');
+    // console.log("get-by-id context type header:" + contentType)
     if (contentType.includes('text/')) {
-      return [res.headers.get("content-type"), await res.text()];
+      try {
+        return [res.headers.get("content-type"), await res.text()];
+      } catch (e) {
+        console.error('cannot return text fragment', { e });
+      }
     } else if (contentType.includes('application/json')) {
       try {
         return [res.headers.get("content-type"), await res.json()];

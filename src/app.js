@@ -74,11 +74,15 @@ async function init() {
 
       await postFragment(user, document.getElementById("textFragment").value, 'text/plain');
       
-      const fragment = await getUserFragments(user);
+      //expanded
+      const fragments = await getUserFragments(user, 1);
 
       //use the most recently added fragment's id
-      if (fragment && fragment !== undefined) {
-        const res = await getFragmentById(user, fragment.data.fragments[fragment.data.fragments.length -1]);
+      if (fragments && fragments !== undefined) {
+        await fragments.data.fragments.sort(function(a,b){
+          return new Date(b.created) - new Date(a.created);
+        });
+        const res = await getFragmentById(user, fragments.data.fragments[0].id);
         document.querySelector('.fragment').innerText = res[1];
       }
     } catch (e) {
@@ -116,17 +120,20 @@ async function init() {
     const reader = new FileReader();
 
     // for a2, only support md -> html conversion.
-    async function handleConvertTypeForm(e, fragment) {
+    async function handleConvertTypeForm(e, fragments) {
       let res;
       e.preventDefault();
       const selectedConversionType = document.getElementById('convertTypes').value;
       try {
+        await fragments.data.fragments.sort(function(a,b){
+          return new Date(b.created) - new Date(a.created);
+        });
         if (selectedConversionType === 'noConversion') {
           //use the most recently added fragment's id
-          res = await getFragmentById(user, fragment.data.fragments[fragment.data.fragments.length -1]);
+          res = await getFragmentById(user, fragments.data.fragments[0].id);
         } else {
           console.log('selected conversion extension: ' + document.getElementById('convertTypes').value);
-          res = await getFragmentById(user, fragment.data.fragments[fragment.data.fragments.length -1], selectedConversionType);
+          res = await getFragmentById(user, fragments.data.fragments[0].id, selectedConversionType);
         }
         document.querySelector('.fragment').innerText = typeof res[1] === 'object' ? JSON.stringify(res[1]) : res[1];
       } catch (e) {
@@ -146,12 +153,12 @@ async function init() {
           await postFragment(user, e.target.result, f.type);
         }
 
-        const fragment = await getUserFragments(user);
-        if (fragment && fragment !== undefined) {
+        const fragments = await getUserFragments(user, 1);
+        if (fragments && fragments !== undefined) {
           handleConvertTypeFormOptions();
 
           var convertTypeForm = document.getElementById("convertTypeform");
-          convertTypeForm.addEventListener("submit", (e) => handleConvertTypeForm(e, fragment)); 
+          convertTypeForm.addEventListener("submit", (e) => handleConvertTypeForm(e, fragments)); 
         }
       };
     })(f);
