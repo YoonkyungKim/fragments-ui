@@ -31,10 +31,7 @@ async function init() {
   // Log the user info for debugging purposes
   console.log({ user });
 
-  const expandedFragments = await getUserFragments(user, 1);
-  if (expandedFragments) {
-    console.log('Got user fragments data', expandedFragments);
-  }
+  await getUserFragments(user, 1);
 
   // Update the UI to welcome the user
   userSection.hidden = false;
