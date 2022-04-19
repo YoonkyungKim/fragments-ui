@@ -32,7 +32,9 @@ async function init() {
   console.log({ user });
 
   const expandedFragments = await getUserFragments(user, 1);
-  console.log('Got user fragments data', expandedFragments );
+  if (expandedFragments) {
+    console.log('Got user fragments data', expandedFragments);
+  }
 
   // Update the UI to welcome the user
   userSection.hidden = false;
@@ -43,7 +45,6 @@ async function init() {
   // Disable the Login button
   loginBtn.disabled = true;
 
-  const textFormSection = document.querySelector('#textFormSection');
   const existingFragmentsSection = document.querySelector('#existingFragmentsSection');
   const selectTypeSection = document.querySelector('#type');
   const fileImportSection = document.querySelector('#fileImport');
@@ -62,12 +63,14 @@ async function init() {
 
   // select what to do: create/update/delete
   document.getElementById('features').addEventListener('change', async function(e) {
-    // console.log('You selected: ', this.value);
     e.preventDefault();
     selectedFeature = e.target.value;
     console.log('selected feature: ' + selectedFeature);
 
+    // remove fragment value displayed before
+    img.src = '';   
     fragmentToDisplay.innerHTML = '';
+
     if (selectedFeature === 'view') {
       convertTypeFormSection.style.display = 'inline-block';
     } else {
@@ -90,17 +93,14 @@ async function init() {
       await fillFragmentsOptions(fragments.data.fragments);
       existingFragmentsSection.style.display='inline-block';
       selectTypeSection.style.display='none';
-      textFormSection.style.display='none';
 
       if (selectedFeature === 'update') {
         fileImportSection.style.display='block';
-        document.getElementById('textFormSubmitBtn').value = `${selectedFeature} a fragment`;
       } else {
         fileImportSection.style.display='none';
       }
     } else {
       existingFragmentsSection.style.display='none';
-      textFormSection.style.display='block';
       selectTypeSection.style.display='block';
       fileImportSection.style.display='block';
     }
@@ -120,7 +120,13 @@ async function init() {
 
   // fill the options to select existing fragment to view/update/delete
   function fillFragmentsOptions(fragments) {
+    // sort by updated value: for when working with DynamoDB
+    fragments.sort(function(a,b){
+      return new Date(b.updated) - new Date(a.updated);
+    });
+
     const select = document.getElementById('existingFragments');
+    
     for (let i=0; i<fragments.length; i++) {
       const option = new Option();
       option.value = JSON.stringify({id: fragments[i].id, type: fragments[i].type});
@@ -148,14 +154,6 @@ async function init() {
       const selectedFragmentId = selectedFragment.id;
       selectedType = selectedFragment.type;
       console.log('selected fragment: ' + selectedFragmentId);
-
-      if (selectedType !== 'text/plain') {
-        textFormSection.style.display='none';
-      } else {
-        if (selectedFeature === 'update') {
-          textFormSection.style.display='inline-block';
-        }
-      }
     }
   });
 
@@ -164,15 +162,9 @@ async function init() {
     e.preventDefault();
     selectedType = e.target.value;
     console.log('selected type: ' + selectedType);
-
-    if (selectedType !== 'text/plain') {
-      textFormSection.style.display='none';
-    } else {
-      textFormSection.style.display='inline-block';
-    }
   });
   
-  // to reduce duplicate code.. (when dealing with textForm and file upload)
+  // to reduce duplicate code.. 
   async function create(inputData, type) {
     try {
       const fragment = await postFragment(user, inputData, type);
@@ -192,21 +184,6 @@ async function init() {
       }
     } catch (e) {
       console.log(e);
-    }
-  }
-  
-  var textForm = document.getElementById('textForm');
-  
-  textForm.addEventListener('submit', handleTextForm);   
- 
-  async function handleTextForm(e) {
-    e.preventDefault();
-    // console.log("input in index.html: " + document.getElementById("textFragment").value);
-    console.log('selected feature: ' + selectedFeature);
-    if (selectedFeature === 'create') {
-      create(document.getElementById('textFragment').value, 'text/plain');
-    } else {
-      update(document.getElementById('textFragment').value, selectedFragment.id, 'text/plain');
     }
   }
 
