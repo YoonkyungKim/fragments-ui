@@ -87,7 +87,6 @@ async function init() {
       const fragments = await getUserFragments(user, 1);
       document.getElementById('existingFragmentsLbl').innerText = `Choose a fragment to ${selectedFeature}`;
       
-      console.log(fragments);
       removeFragmentsOptions();
       // fill the options to select existing fragment to view/update/delete
       await fillFragmentsOptions(fragments.data.fragments);
@@ -163,29 +162,6 @@ async function init() {
     selectedType = e.target.value;
     console.log('selected type: ' + selectedType);
   });
-  
-  // to reduce duplicate code.. 
-  async function create(inputData, type) {
-    try {
-      const fragment = await postFragment(user, inputData, type);
-      if (fragment) {
-        fragmentToDisplay.innerHTML =  `Fragment of type ${fragment.fragment.type} with id: ${fragment.fragment.id} is created!`;
-      }
-    } catch (e) {
-      console.log(e);
-    }
-  }
-
-  async function update(inputData, type, id) {
-    try {
-      const fragment = await updateFragment(user, inputData, id, type);
-      if (fragment) {
-        fragmentToDisplay.innerHTML =  `Fragment of type ${fragment.fragment.type} with id: ${fragment.fragment.id} is updated!`;
-      }
-    } catch (e) {
-      console.log(e);
-    }
-  }
 
   async function displayFragment(id, selectedConversionType) {
     try {
@@ -249,10 +225,20 @@ async function init() {
           alert('Uploaded file type must be same as selected type.');
         } else {
           console.log('selected feature: ' + selectedFeature);
-          if (selectedFeature === 'create') {
-            create(e.target.result, f.type);
-          } else {
-            update(e.target.result, f.type, selectedFragment.id);
+
+          let fragment;
+
+          try {
+            if (selectedFeature === 'create') {
+              fragment = await postFragment(user, e.target.result, f.type);
+            } else {
+              fragment = await updateFragment(user, e.target.result, selectedFragment.id, f.type);
+            }
+            if (fragment) {
+              fragmentToDisplay.innerHTML = `Fragment of type ${fragment.fragment.type} with id: ${fragment.fragment.id} is ${selectedFeature}d!`;
+            }
+          } catch (e) {
+            console.log(e);
           }
         }
       };
