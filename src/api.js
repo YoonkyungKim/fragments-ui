@@ -39,9 +39,7 @@ export async function getFragmentById(user, id, ext='') {
     
     if (!res.ok) {
       const error = await res.json();
-      console.log(error.error.message);
-      console.log(`res.ok is false, ${res.status} ${res.statusText}`);
-      throw error.error.message;
+      throw error.error?.message || res.statusText;
     }
 
     console.log('Got fragments data with given id', res);
@@ -91,13 +89,15 @@ export async function postFragment(user, value, contentType) {
       body: value,
     });
     if (!res.ok) {
-      throw new Error(`{res.status} ${res.statusText}`);
+      const error = await res.json();
+      throw error.error?.message || res.statusText;
     }
     const data = await res.json();
     console.log('Posted fragments data', { data });
     return data;
   } catch (err) {
     console.error('Unable to call POST /v1/fragments', { err });
+    throw new Error(err);
   }
 }
 
@@ -117,7 +117,7 @@ export async function updateFragment(user, value, id, contentType) {
       body: value,
     });
     if (!res.ok) {
-      throw new Error(`{res.status} ${res.statusText}`);
+      throw new Error(`${res.status} ${res.statusText}`);
     }
     const data = await res.json();
     console.log('Updated fragments data', { data });
@@ -141,7 +141,7 @@ export async function deleteFragment(user, id) {
       },
     });
     if (!res.ok) {
-      throw new Error(`{res.status} ${res.statusText}`);
+      throw new Error(`${res.status} ${res.statusText}`);
     }
     const data = await res.json();
     console.log('Deleted fragments data', { data });

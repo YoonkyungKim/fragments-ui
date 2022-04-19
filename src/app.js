@@ -235,7 +235,7 @@ async function init() {
               fragmentToDisplay.innerHTML = `Fragment of type ${fragment.fragment.type} with id: ${fragment.fragment.id} is ${selectedFeature}d!`;
             }
           } catch (e) {
-            console.log(e);
+            fragmentToDisplay.innerText = e;
           }
         }
       };
