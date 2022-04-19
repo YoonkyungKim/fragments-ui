@@ -20,7 +20,7 @@ export async function getUserFragments(user, expand=0) {
       throw new Error(`${res.status} ${res.statusText}`);
     }
     const data = await res.json();
-    // console.log('Got user fragments data', { data });
+    console.log('Got user fragments data', { data });
     return { data };
   } catch (err) {
     console.error('Unable to call GET /v1/fragments', { err });
@@ -36,32 +36,42 @@ export async function getFragmentById(user, id, ext='') {
         Authorization: `Bearer ${user.idToken}`,
       },
     });
+    
     if (!res.ok) {
+      const error = await res.json();
+      console.log(error.error.message);
       console.log(`res.ok is false, ${res.status} ${res.statusText}`);
-      throw new Error(`${res.status} ${res.statusText}`);
+      throw error.error.message;
     }
 
     console.log('Got fragments data with given id', res);
-    console.log('res content type', res.headers.get("content-type"));
+    console.log('res content type', res.headers.get('content-type'));
 
     const contentType = res.headers.get('content-type');
-    // console.log("get-by-id context type header:" + contentType)
-    if (contentType.includes('text/')) {
+
+    if (contentType.startsWith('text/')) {
       try {
-        return [res.headers.get("content-type"), await res.text()];
+        return { contentType, data: await res.text() };
       } catch (e) {
         console.error('cannot return text fragment', { e });
       }
-    } else if (contentType.includes('application/json')) {
+    } else if (contentType.startsWith('application/json')) {
       try {
-        return [res.headers.get("content-type"), await res.json()];
+        return { contentType, data: await res.json() };
       } catch (e) {
-        console.error('cannot return json', { e });
+        console.error('cannot return json fragment', { e });
       }      
+    } else if (contentType.startsWith('image/')) {
+      try {
+        const myBlob = await res.blob();
+        return { contentType, data: myBlob };
+      } catch (e) {
+        console.error('cannot return image blob', { e });
+      } 
     }
-    // will add more conditions for a3
   } catch (err) {
     console.error('Unable to call GET /v1/fragments/:id', { err });
+    throw new Error(err);
   }
 }
 
@@ -72,7 +82,7 @@ export async function postFragment(user, value, contentType) {
   console.log('Post fragment data...');
   try {
     const res = await fetch(`${apiUrl}/v1/fragments`, {
-      method: "POST",
+      method: 'POST',
       headers: {
         // Include the user's ID Token in the request so we're authorized
         Authorization: `Bearer ${user.idToken}`,
@@ -85,7 +95,58 @@ export async function postFragment(user, value, contentType) {
     }
     const data = await res.json();
     console.log('Posted fragments data', { data });
+    return data;
   } catch (err) {
     console.error('Unable to call POST /v1/fragments', { err });
+  }
+}
+
+/**
+ * Put (update) fragment to the server
+ */
+export async function updateFragment(user, value, id, contentType) {
+  console.log('Update fragment data...');
+  try {
+    const res = await fetch(`${apiUrl}/v1/fragments/${id}`, {
+      method: 'PUT',
+      headers: {
+        // Include the user's ID Token in the request so we're authorized
+        Authorization: `Bearer ${user.idToken}`,
+        'Content-Type': contentType,
+      },
+      body: value,
+    });
+    if (!res.ok) {
+      throw new Error(`{res.status} ${res.statusText}`);
+    }
+    const data = await res.json();
+    console.log('Updated fragments data', { data });
+    return data;
+  } catch (err) {
+    console.error('Unable to call PUT /v1/fragments', { err });
+  }
+}
+
+/**
+ * Delete fragment from the server
+ */
+export async function deleteFragment(user, id) {
+  console.log('Delete fragment data...');
+  try {
+    const res = await fetch(`${apiUrl}/v1/fragments/${id}`, {
+      method: 'DELETE',
+      headers: {
+        // Include the user's ID Token in the request so we're authorized
+        Authorization: `Bearer ${user.idToken}`,
+      },
+    });
+    if (!res.ok) {
+      throw new Error(`{res.status} ${res.statusText}`);
+    }
+    const data = await res.json();
+    console.log('Deleted fragments data', { data });
+    return data;
+  } catch (err) {
+    console.error('Unable to call DELETE /v1/fragments', { err });
   }
 }

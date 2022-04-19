@@ -15,60 +15,88 @@
       <h2>Hello <span class="username"></span>!</h2>
     </section>
     
-    <h3>Create a fragment</h3>
+    <section id="feature">
+      <label for="features">What do you want to do with fragments app?</label>
+      <select id="features" name="featureList" form="featureform">
+        <option value="create">Create fragment</option>
+        <option value="view">View fragment</option>
+        <option value="update">Update fragment</option>
+        <option value="delete">Delete fragment</option>
+      </select>
+    </section>
+
+    <section id="existingFragmentsSection" style="display: none">
+      <br>
+      <form id="existingFragmentsForm">
+        <label id="existingFragmentsLbl" for="existingFragments">Choose a fragment:</label>
+        <select id="existingFragments" name="existingFragmentsList" form="existingFragmentsForm">
+        <!-- options will be added programatically -->
+          <option id="default" value="Select a fragment">Select a fragment</option>
+        </select>
+        <br><br>
+      </form>
+      <br>
+    </section>
+
+    <br>
     <section id="type">
-      <label for="types">Choose a fragment type:</label>
+      <label for="types">Choose a fragment type to create:</label>
       <select id="types" name="typeList" form="typeform">
         <option value="text/plain">text/plain</option>
         <option value="text/markdown">text/markdown</option>
         <option value="text/html">text/html</option>
         <option value="application/json">application/json</option>
-        <option value="application/json" disabled>image/png</option>
-        <option value="application/json" disabled>image/jpeg</option>
-        <option value="application/json" disabled>image/webp</option>
-        <option value="application/json" disabled>image/gif</option>
+        <option value="image/png">image/png</option>
+        <option value="image/jpeg">image/jpeg</option>
+        <option value="image/webp">image/webp</option>
+        <option value="image/gif">image/gif</option>
       </select>
+      <br><br>
     </section>
-
-    </br>
 
     <section id="textFormSection">
       <form id="textForm" >
         <label for="textFragment">Enter some text:</label>
         <input type="text" id="textFragment" name="textFragment" placeholder="Enter fragment">
-        </br></br>
-        <input type="submit" value="Submit">
+        <br><br>
+        <input id="textFormSubmitBtn" type="submit" value="Create fragment">
       </form>
       <h3>or</h3>
     </section>
 
     <section id="fileImport">
       <label class="button" tabindex="0">Import a file:
-        <input type="file" id="inputFile" accept="text/*,application/json" multiple>
+        <input type="file" id="inputFile" multiple>
       </label>
+      <br>
     </section>
 
-    </br>
-
-    <section id="convertType">
-      <form id="convertTypeform">
+    <section id="convertType" style="display: none">
+      <form id="convertTypeForm">
         <label for="convertTypes">Choose a type to convert to:</label>
-        <select id="convertTypes" name="convertTypeList" form="convertTypeform">
-          <option value="noConversion">No conversion</option>
+        <select id="convertTypes" name="convertTypeList" form="convertTypeForm">
+          <option value="">No conversion</option>
           <option value=".txt">text/plain</option>
           <option value=".md">text/markdown</option>
           <option value=".html">text/html</option>
           <option value=".json">application/json</option>
-          <option value=".png" disabled>image/png</option>
-          <option value=".jpeg" disabled>image/jpeg</option>
-          <option value=".webp" disabled>image/webp</option>
-          <option value=".gif" disabled>image/gif</option>
+          <option value=".png">image/png</option>
+          <option value=".jpg">image/jpeg</option>
+          <option value=".webp">image/webp</option>
+          <option value=".gif">image/gif</option>
         </select>
-        <input type="submit" value="Get created fragment">
+        <input type="submit" value="View fragment">
       </form>
     </section>
 
-    <h2><span class="fragment"></span></h2>
+    <button id="deleteBtn" style="display: none">Delete a fragment</button>
+
+    <div>
+      <br>
+      <span class="fragment"></span>
+    </div>
+
+    <img id="imageFragment" alt="" />
   </body>
 
   <script type="module" src="app.js"></script>
