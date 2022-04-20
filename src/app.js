@@ -1,5 +1,5 @@
 import { Auth, getUser } from './auth';
-import { getUserFragments, getFragmentById, postFragment, updateFragment, deleteFragment } from './api';
+import { getUserFragments, getFragmentById, getFragmentByIdInfo, postFragment, updateFragment, deleteFragment } from './api';
 
 async function init() {
   // Get our UI elements
@@ -46,11 +46,13 @@ async function init() {
   const selectTypeSection = document.querySelector('#type');
   const fileImportSection = document.querySelector('#fileImport');
   const convertTypeFormSection = document.querySelector('#convertType');
+  const metadataSection = document.querySelector('#metadataSection');
 
   const convertTypeForm = document.getElementById('convertTypeForm');
   const img = document.getElementById('imageFragment');
   const deleteBtn = document.getElementById('deleteBtn');
-  const fragmentToDisplay = document.querySelector('.fragment');
+  const fragmentToDisplay = document.getElementById('fragment');
+  const metadataToDisplay = document.getElementById('metadata');
 
   // default feature is create
   let selectedFeature = 'create';
@@ -67,6 +69,8 @@ async function init() {
     // remove fragment value displayed before
     img.src = '';   
     fragmentToDisplay.innerHTML = '';
+    metadataToDisplay.innerText = '';
+    metadataSection.style.display = 'none';
 
     if (selectedFeature === 'view') {
       convertTypeFormSection.style.display = 'inline-block';
@@ -170,7 +174,11 @@ async function init() {
       img.src = '';
 
       const { contentType, data } = await getFragmentById(user, id, selectedConversionType);
-      
+      const metadata = await getFragmentByIdInfo(user, id);
+      if (metadata) {
+        metadataSection.style.display = 'block';
+        metadataToDisplay.innerHTML = JSON.stringify(metadata);
+      }
       if (contentType.startsWith('image/')) {
         img.src = URL.createObjectURL(data);  
       } else if (contentType.startsWith('text/html')) {
@@ -181,6 +189,7 @@ async function init() {
     } catch (e) {
       console.error('Get by id failed after post through file: ', { e });
       fragmentToDisplay.innerText = e;
+      metadataSection.style.display = 'none';
     }
   }
 

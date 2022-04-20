@@ -73,6 +73,32 @@ export async function getFragmentById(user, id, ext='') {
   }
 }
 
+export async function getFragmentByIdInfo(user, id) {
+  console.log(`Requesting user fragment metadata by id ${id}`);
+  try {
+    const res = await fetch(`${apiUrl}/v1/fragments/${id}/info`, {
+      headers: {
+        // Include the user's ID Token in the request so we're authorized
+        Authorization: `Bearer ${user.idToken}`,
+      },
+    });
+    
+    if (!res.ok) {
+      const error = await res.json();
+      throw error.error?.message || res.statusText;
+    }
+
+    // console.log('Got fragments metadata with given id', res);
+
+    const data = await res.json();
+    console.log('Got fragment metadata', { data });
+    return data;
+  } catch (err) {
+    console.error('Unable to call GET /v1/fragments/:id', { err });
+    throw new Error(err);
+  }
+}
+
 /**
  * Post fragment to the server
  */
